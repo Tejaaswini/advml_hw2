@@ -85,6 +85,12 @@ We evaluate using four standard ranking metrics that capture different aspects o
 
 \textbf{AUC:} Area Under the ROC Curve, measuring discrimination between clicked and non-clicked candidates.
 
+\textbf{Precision @ 5:} Fraction of top-5 recommended articles that were clicked. This measures the accuracy of recommendations at the top-k level.
+
+\textbf{Recall @ 5:} Fraction of clicked articles that appear in the top-5 recommendations. This measures the coverage of relevant items.
+
+\textbf{F1 @ 5:} Harmonic mean of Precision @ 5 and Recall @ 5, providing a balanced measure of recommendation quality.
+
 \section{Results}
 
 Table~\ref{tab:results} summarizes the performance of all three approaches on both training and development sets.
@@ -92,18 +98,18 @@ Table~\ref{tab:results} summarizes the performance of all three approaches on bo
 \begin{table*}[t]
 \centering
 \small
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccccccc}
 \toprule
-\textbf{Method} & \textbf{Set} & \textbf{HR@1} & \textbf{MRR} & \textbf{NDCG@5} & \textbf{AUC} & \textbf{Coverage} \\
+\textbf{Method} & \textbf{Set} & \textbf{HR@1} & \textbf{MRR} & \textbf{NDCG@5} & \textbf{AUC} & \textbf{Prec@5} & \textbf{Rec@5} & \textbf{F1@5} & \textbf{Coverage} \\
 \midrule
-Content-Based & Train & 0.8308 & 0.9061 & 0.9887 & 0.9869 & 100.0\% \\
-              & Dev   & 0.1056 & 0.2513 & 0.3496 & 0.5386 & 92.9\% \\
+Content-Based & Train & 0.8308 & 0.9061 & 0.9887 & 0.9869 & -- & -- & -- & 100.0\% \\
+              & Dev   & 0.1056 & 0.2513 & 0.3496 & 0.5386 & -- & -- & -- & 92.9\% \\
 \midrule
-User-Based CF & Train & 0.6080 & 0.7032 & 0.7752 & 0.8352 & 100.0\% \\
-              & Dev   & 0.1002 & 0.2444 & 0.3392 & 0.5345 & 92.1\% \\
+User-Based CF & Train & 0.6080 & 0.7032 & 0.7752 & 0.8352 & -- & -- & -- & 100.0\% \\
+              & Dev   & 0.1002 & 0.2444 & 0.3392 & 0.5345 & -- & -- & -- & 92.1\% \\
 \midrule
-Clustering    & Train & 0.2721 & 0.3973 & 0.4826 & 0.6370 & 100.0\% \\
-              & Dev   & 0.1001 & 0.2444 & 0.3397 & 0.5351 & 92.1\% \\
+Clustering    & Train & 0.2721 & 0.3973 & 0.4826 & 0.6370 & 0.1408 & -- & 0.2159 & 100.0\% \\
+              & Dev   & 0.1001 & 0.2444 & 0.3397 & 0.5351 & 0.0915 & -- & 0.1442 & 92.1\% \\
 \bottomrule
 \end{tabular}
 \caption{Performance comparison on MINDsmall dataset. Training performance varies widely (HR@1: 27.21\%--83.08\%), but development performance converges (HR@1: 10.01\%--10.56\%) due to cold-start dominance. Coverage remains high ($>$92\%) across all methods.}
