@@ -5,6 +5,8 @@
 \usepackage{booktabs}
 \usepackage{geometry}
 \usepackage{balance}
+\usepackage{subcaption}
+\usepackage{float}
 \geometry{margin=0.7in}
 
 \title{News Recommendation Systems: A Comparative Evaluation of Content-Based, User-Based Collaborative Filtering, and Clustering Approaches}
@@ -102,14 +104,14 @@ Table~\ref{tab:results} summarizes the performance of all three approaches on bo
 \toprule
 \textbf{Method} & \textbf{Set} & \textbf{HR@1} & \textbf{MRR} & \textbf{NDCG@5} & \textbf{AUC} & \textbf{Prec@5} & \textbf{Rec@5} & \textbf{F1@5} & \textbf{Coverage} \\
 \midrule
-Content-Based & Train & 0.8308 & 0.9061 & 0.9887 & 0.9869 & -- & -- & -- & 100.0\% \\
-              & Dev   & 0.1056 & 0.2513 & 0.3496 & 0.5386 & -- & -- & -- & 92.9\% \\
+Content-Based & Train & 0.8308 & 0.9061 & 0.9887 & 0.9869 & 0.3085 & 0.9970 & 0.4496 & 100.0\% \\
+              & Dev   & 0.1056 & 0.2513 & 0.3496 & 0.5386 & 0.0947 & 0.3882 & 0.1489 & 92.9\% \\
 \midrule
-User-Based CF & Train & 0.6080 & 0.7032 & 0.7752 & 0.8352 & -- & -- & -- & 100.0\% \\
-              & Dev   & 0.1002 & 0.2444 & 0.3392 & 0.5345 & -- & -- & -- & 92.1\% \\
+User-Based CF & Train & 0.6080 & 0.7032 & 0.7752 & 0.8352 & 0.2259 & 0.8143 & 0.3424 & 100.0\% \\
+              & Dev   & 0.1002 & 0.2444 & 0.3392 & 0.5345 & 0.0914 & 0.3773 & 0.1440 & 92.1\% \\
 \midrule
-Clustering    & Train & 0.2721 & 0.3973 & 0.4826 & 0.6370 & 0.1408 & -- & 0.2159 & 100.0\% \\
-              & Dev   & 0.1001 & 0.2444 & 0.3397 & 0.5351 & 0.0915 & -- & 0.1442 & 92.1\% \\
+Clustering    & Train & 0.2721 & 0.3973 & 0.4826 & 0.6370 & 0.1408 & 0.5233 & 0.2159 & 100.0\% \\
+              & Dev   & 0.1001 & 0.2444 & 0.3397 & 0.5351 & 0.0915 & 0.3778 & 0.1442 & 92.1\% \\
 \bottomrule
 \end{tabular}
 \caption{Performance comparison on MINDsmall dataset. Training performance varies widely (HR@1: 27.21\%--83.08\%), but development performance converges (HR@1: 10.01\%--10.56\%) due to cold-start dominance. Coverage remains high ($>$92\%) across all methods.}
@@ -124,13 +126,15 @@ Content-based filtering achieves the highest training accuracy (HR@1: 83.08\%, M
 
 All three methods show dramatic performance degradation on the development set, with HR@1 dropping to approximately 10\% across all approaches. This convergence strongly correlates with the absence of user history for 88.1\% of development users, forcing all methods to revert to popularity-driven behavior. Content-based filtering maintains a slight edge (HR@1: 10.56\% vs 10.01\%--10.02\%), possibly due to its ability to score new articles through content similarity even without user history. However, personalization is fundamentally limited by missing historical context.
 
-Notably, coverage remains high ($>$92\%) across all methods, indicating that the systems can generate recommendations for most users, though these recommendations are largely non-personalized.
+Notably, coverage remains high ($>$92\%) across all methods, indicating that the systems can generate recommendations for most users, though these recommendations are largely non-personalized. Figure~\ref{fig:dev_comparison} visualizes the development performance across all metrics, showing the convergence of performance despite different training accuracies.
 
 \section{Analysis}
 
 \subsection{Generalization Gap}
 
 The relative degradation from training to development performance reveals critical differences in generalization behavior. Content-based filtering shows the largest relative drop (87.3\% decrease in HR@1), suggesting overfitting to training user patterns. User-based CF shows an 83.5\% drop, while clustering shows the smallest relative decrease (63.2\%). Thus, although clustering performs worst on training data, it exhibits the most stable behavior under distribution shift, indicating better robustness to the cold-start scenario.
+
+Figure~\ref{fig:train_dev_comparison} illustrates the train--dev performance gap for each method. The visualization reveals that while training performance varies dramatically (HR@1 ranging from 27\% to 83\%), development performance converges to approximately 10\% across all methods. Figure~\ref{fig:generalization} shows the generalization scores (dev/train ratio) and relative performance drops, confirming that clustering exhibits the most stable generalization behavior despite lower absolute performance.
 
 \subsection{Cold-Start Dominance}
 
@@ -151,6 +155,58 @@ The convergence of development performance across methods, despite their differe
 Our evaluation of three representative recommendation approaches reveals that development-set performance converges due to extreme cold-start conditions inherent in news personalization. Content-based filtering excels when data is sufficient (83\% HR@1) but generalizes poorly (87.3\% drop). User-based CF suffers from sparsity and scalability issues, while clustering offers the most stable performance across splits despite lower absolute accuracy.
 
 The convergence of development performance across fundamentally different algorithms underscores that cold-start handling, rather than algorithmic sophistication, is the primary challenge in news recommendation systems. Future work should prioritize hybrid architectures combining content and collaborative signals, incorporating temporal dynamics, demographic features, and other side-information to address the cold-start problem. These factors dominate real-world recommendation quality more than the choice of base algorithm.
+
+\begin{figure*}[t]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/dev_performance_comparison.png}
+\caption{Development set performance comparison across all metrics.}
+\label{fig:dev_comparison_a}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/dev_heatmap.png}
+\caption{Performance heatmap showing metric scores for each method.}
+\label{fig:dev_comparison_b}
+\end{subfigure}
+\caption{Development set performance visualization. (a) Side-by-side bar chart comparing all three methods across seven metrics (HR@k, MRR, NDCG@k, Precision@k, Recall@k, F1@k, Coverage). (b) Heatmap showing performance intensity, with warmer colors (yellow/orange) indicating higher scores. All methods converge to similar performance levels (HR@1 $\approx$ 10\%) despite different training accuracies, highlighting the dominance of cold-start effects.}
+\label{fig:dev_comparison}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/train_dev_content_based.png}
+\caption{Content-Based}
+\label{fig:train_dev_a}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/train_dev_user_based.png}
+\caption{User-Based CF}
+\label{fig:train_dev_b}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/train_dev_clustering.png}
+\caption{Clustering}
+\label{fig:train_dev_c}
+\end{subfigure}
+\caption{Train vs Dev performance comparison for each method. The gap between training (lighter bars) and development (darker bars) performance illustrates the generalization challenge. Content-based filtering shows the largest gap (87.3\% relative drop in HR@1), while clustering shows the smallest (63.2\% drop), indicating better robustness to distribution shift despite lower absolute training performance.}
+\label{fig:train_dev_comparison}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/generalization_analysis.png}
+\caption{Generalization analysis showing (left) absolute performance gap (Train - Dev) and (right) generalization score (Dev/Train ratio). The left panel reveals overfitting magnitude, with clustering exhibiting the smallest gaps across most metrics. The right panel shows generalization scores where values closer to 1.0 indicate better generalization. Clustering consistently shows the highest ratios, confirming its robustness to cold-start conditions despite lower absolute training performance.}
+\label{fig:generalization}
+\end{figure*}
 
 \balance
 
